@@ -1,68 +1,63 @@
+
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'note_details_page.dart';
+import 'notes_page.dart';
+import 'model.dart';
+
+class NotesApp extends StatefulWidget {
+  const NotesApp({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _NotesAppState();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class _NotesAppState extends State<NotesApp> {
+  Note? _selectedNote = null;
+  List<Note> notes = Note.notes;
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      home: Navigator(
+        pages: [
+          MaterialPage(
+              key: const ValueKey("homePage"),
+              child: NotesPage(
+                items: notes,
+                onSelectNote: _setSelectedNote,
+              )),
+          if (_selectedNote != null )
+            MaterialPage(
+              key: ValueKey(_selectedNote?.id),
+              child: DetailsPage(note: _selectedNote!),
+            )
+          ],
+        onPopPage: (route, result) {
+          if (!route.didPop(result)) {
+            return false;
+          }
+          _unsetSelectedNote();
+          return true;
+        },
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      theme: ThemeData(primarySwatch: Colors.grey),
     );
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
+  void _setSelectedNote(Note note) {
     setState(() {
-      _counter++;
+      _selectedNote = note;
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
+  void _unsetSelectedNote() {
+    setState(() {
+      _selectedNote = null;
+    });
   }
+}
+
+void main() {
+  runApp(const NotesApp());
 }
