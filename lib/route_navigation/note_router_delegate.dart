@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/note_details_screen.dart';
+import 'package:flutter_app/notes_screen.dart';
 import 'package:flutter_app/route_navigation/note_route_path.dart';
-import 'package:flutter_app/notes_page.dart';
 
-import '../model.dart';
-import '../note_details_page.dart';
+import '../model/note.dart';
+
 
 class NoteRouterDelegate extends RouterDelegate<NoteRoutePath>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<NoteRoutePath> {
@@ -40,14 +41,14 @@ class NoteRouterDelegate extends RouterDelegate<NoteRoutePath>
       pages: [
         MaterialPage(
             key: const ValueKey("NotesPage"),
-            child: NotesPage(
+            child: NotesScreen(
               items: notes,
               onSelectNote: _setSelectedNote,
             )),
         if (_selectedNote != null)
           MaterialPage(
             key: ValueKey(_selectedNote?.id),
-            child: DetailsPage(note: _selectedNote!),
+            child: NoteDetailsScreen(note: _selectedNote!),
           )
       ],
       onPopPage: (route, result) {

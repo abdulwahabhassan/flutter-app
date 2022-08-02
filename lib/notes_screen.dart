@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/main.dart';
+import 'package:flutter_app/new_note_bottom_sheet.dart';
+import 'model/note.dart';
 
-import 'model.dart';
-
-class NotesPage extends StatelessWidget {
-  const NotesPage({Key? key, required this.items, required this.onSelectNote})
+class NotesScreen extends StatelessWidget {
+  const NotesScreen({Key? key, required this.items, required this.onSelectNote})
       : super(key: key);
 
   final List<Note> items;
@@ -13,9 +12,10 @@ class NotesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: IconButton(onPressed: () {}, icon: const Icon(Icons.menu)),
-        title: const Text("Flutter"),
+        title: const Text("Notes"),
         actions: [
           IconButton(
               onPressed: () {},
@@ -43,12 +43,21 @@ class NotesPage extends StatelessWidget {
             );
           }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          showModalBottomSheet(
+            isScrollControlled: true,
+            context: context,
+            builder: (builder) {
+              return newNoteBottomSheet(context);
+            },
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12.0),
+                    topRight: Radius.circular(12.0))),
+          );
+        },
         child: const Icon(Icons.edit_note_rounded),
       ),
-      // drawer: ,
-      // bottomNavigationBar: ,
-      // bottomSheet: ,
     );
   }
 }

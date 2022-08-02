@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 class Note {
   Note(
       {required this.id,
