@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_app/note_details_screen.dart';
 import 'model/note.dart';
@@ -8,7 +7,7 @@ class NotesApp extends StatefulWidget {
   const NotesApp({super.key});
 
   @override
-  State<StatefulWidget> createState() => _NotesAppState();
+  State<NotesApp> createState() => _NotesAppState();
 }
 
 class _NotesAppState extends State<NotesApp> {
@@ -26,12 +25,12 @@ class _NotesAppState extends State<NotesApp> {
                 items: notes,
                 onSelectNote: _setSelectedNote,
               )),
-          if (_selectedNote != null )
+          if (_selectedNote != null)
             MaterialPage(
               key: ValueKey(_selectedNote?.id),
               child: NoteDetailsScreen(note: _selectedNote!),
             )
-          ],
+        ],
         onPopPage: (route, result) {
           if (!route.didPop(result)) {
             return false;
