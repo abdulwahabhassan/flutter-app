@@ -1,3 +1,3 @@
-<h1 align="center">Flutter App</h1>
+<h1 align="center">Notes</h1>
 
 I'll give you something to read later...
