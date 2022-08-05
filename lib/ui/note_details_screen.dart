@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'model/note.dart';
 import 'dart:io';
 
+import '../model/note.dart';
+import 'new_note_bottom_sheet.dart';
+
+//WIDGET
 class NoteDetailsScreen extends StatefulWidget {
   const NoteDetailsScreen({
     Key? key,
     required this.note,
+    required this.onNoteUpdated,
   }) : super(key: key);
 
   final Note note;
+  final ValueChanged<Note> onNoteUpdated;
 
   @override
   State<NoteDetailsScreen> createState() => _NoteDetailsScreenState();
 }
 
+//STATE
 class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
   List<XFile>? _imageFileList;
   dynamic _pickImageError;
@@ -35,7 +41,31 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
           style: const TextStyle(inherit: true, fontSize: 18),
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+          IconButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (builder) {
+                    return NewNoteBottomSheetWidget(
+                      initialTitleText: widget.note.title,
+                      initialBodyText: widget.note.body,
+                      onSaveButtonClicked: (Note value) {
+                        widget.onNoteUpdated(Note(
+                            id: widget.note.id,
+                            title: value.title,
+                            body: value.body,
+                            date: widget.note.date));
+                      },
+                    );
+                  },
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(12.0),
+                          topRight: Radius.circular(12.0))),
+                );
+              },
+              icon: const Icon(Icons.edit)),
           IconButton(
               onPressed: () {
                 _handleImagePickerPressed(ImageSource.gallery,
@@ -54,34 +84,29 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                widget.note.title,
-                style: const TextStyle(
-                    inherit: true, fontWeight: FontWeight.bold, fontSize: 18),
-              ),
+              SizedBox(height: 100, child: _handlePreview()),
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      widget.note.body,
-                      style: const TextStyle(inherit: true, fontSize: 15),
-                    ),
-                    Container(
-                      alignment: Alignment.centerRight,
-                      margin: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text(
-                        widget.note.date,
-                        style: const TextStyle(
-                            inherit: true,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13),
-                      ),
-                    ),
-                  ],
+                margin: const EdgeInsets.only(top: 16.0),
+                child: Text(
+                  widget.note.title,
+                  style: const TextStyle(
+                      inherit: true, fontWeight: FontWeight.bold, fontSize: 15),
                 ),
               ),
-              Expanded(child: _handlePreview())
+              Container(
+                margin: const EdgeInsets.only(top: 12.0),
+                child: Text(widget.note.body,
+                    style: const TextStyle(inherit: true, fontSize: 15)),
+              ),
+              Container(
+                alignment: Alignment.centerRight,
+                margin: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Text(
+                  widget.note.date ?? "",
+                  style: const TextStyle(
+                      inherit: true, fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+              ),
             ],
           ),
         ),
@@ -128,21 +153,20 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
     }
     if (_imageFileList != null) {
       return GridView.builder(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
+        clipBehavior: Clip.none,
+        scrollDirection: Axis.horizontal,
         key: UniqueKey(),
         itemBuilder: (BuildContext context, int index) {
           return ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.file(
-              File(_imageFileList![index].path),
-              fit: BoxFit.cover,
-            ),
-          );
+              borderRadius: BorderRadius.circular(8),
+              child: Image.file(
+                File(_imageFileList![index].path),
+                fit: BoxFit.cover,
+              ));
         },
         itemCount: _imageFileList!.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3, crossAxisSpacing: 8, mainAxisSpacing: 8),
+            crossAxisCount: 1, crossAxisSpacing: 8, mainAxisSpacing: 8),
       );
     } else if (_pickImageError != null) {
       return Text(
@@ -156,10 +180,7 @@ class _NoteDetailsScreenState extends State<NoteDetailsScreen> {
         child: const Text(
           'You can add images to this note',
           textAlign: TextAlign.center,
-          style: TextStyle(
-              inherit: true,
-              fontWeight: FontWeight.bold,
-              fontStyle: FontStyle.italic),
+          style: TextStyle(inherit: true, fontStyle: FontStyle.italic),
         ),
       );
     }
