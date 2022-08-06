@@ -31,7 +31,7 @@ class SQLiteHelper {
 
   static Future<List<Note>> getNotes() async {
     final db = await SQLiteHelper.db();
-    final List<Map<String, dynamic>> maps = await db.query('notes');
+    final List<Map<String, dynamic>> maps = await db.query('notes', orderBy: 'date DESC');
     return List.generate(maps.length, (i) {
       return Note(
           id: maps[i]['id'],

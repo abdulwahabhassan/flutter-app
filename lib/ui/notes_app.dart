@@ -5,6 +5,8 @@ import '../model/note.dart';
 import 'note_details_screen.dart';
 import 'notes_list_screen.dart';
 
+enum ScrollTo { top, bottom }
+
 //WIDGET
 class NotesApp extends StatefulWidget {
   const NotesApp({super.key});
@@ -17,21 +19,39 @@ class NotesApp extends StatefulWidget {
 class _NotesAppState extends State<NotesApp> {
   Note? _selectedNote;
   List<Note> _notes = [];
-  late ScrollController _scrollController;
+  late ScrollController _scrollController = ScrollController();
+  IconData _scrollIcon = Icons.keyboard_double_arrow_down_rounded;
+
+  void _scrollListener() {
+    if (_scrollController.offset >= _scrollController.position.maxScrollExtent) {
+      setState(() {
+        _scrollIcon = Icons.keyboard_double_arrow_up_rounded;
+      });
+    }
+    if (_scrollController.offset <= _scrollController.position.minScrollExtent) {
+      setState(() {
+        _scrollIcon = Icons.keyboard_double_arrow_down_rounded;
+      });
+    }
+  }
 
   // This is what you're looking for!
-  void _scrollToTop() {
-    _scrollController.animateTo(
-      0.00,
-      duration: const Duration(seconds: 1),
-      curve: Curves.fastOutSlowIn,
-    );
+  void _scrollToTop(ScrollTo scrollTo) {
+    setState(() {
+      _scrollController.animateTo(
+        scrollTo == ScrollTo.top ? 0.00 : _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 700),
+        curve: Curves.fastOutSlowIn,
+      );
+    });
+
   }
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
     _fetchNotes();
   }
 
@@ -56,6 +76,7 @@ class _NotesAppState extends State<NotesApp> {
                 onSearchStarted: _filterNotes,
                 scrollController: _scrollController,
                 onScrollToTopClicked: _scrollToTop,
+                scrollIcon: _scrollIcon,
                 notes: _notes,
               )),
           if (_selectedNote != null)
@@ -104,6 +125,7 @@ class _NotesAppState extends State<NotesApp> {
   Future<void> _addNewNote(Note note) async {
     await SQLiteHelper.insertNote(note);
     _fetchNotes();
+    _scrollToTop(ScrollTo.top);
   }
 
   Future<void> _filterNotes(String searchQuery) async {

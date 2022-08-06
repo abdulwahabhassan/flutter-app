@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/ui/notes_app.dart';
 
 import 'notes_list_screen.dart';
 
 class NotesAppBar extends StatefulWidget with PreferredSizeWidget {
-  const NotesAppBar(
-      {Key? key,
-      required this.onSearchStarted,
-      required this.onScrollToTopClicked})
+  const NotesAppBar({Key? key,
+    required this.onSearchStarted,
+    required this.onScrollToTopClicked,
+    required this.listViewScrollController,
+    required this.scrollIcon})
       : super(key: key);
 
   final ValueChanged<String> onSearchStarted;
   final ScrollToTopCallback onScrollToTopClicked;
+  final ScrollController listViewScrollController;
+  final IconData scrollIcon;
 
   @override
   State<NotesAppBar> createState() => _NotesAppBar();
@@ -47,18 +51,18 @@ class _NotesAppBar extends State<NotesAppBar> {
       leading: IconButton(onPressed: () {}, icon: const Icon(Icons.menu)),
       title: search
           ? TextFormField(
-              controller: searchBarController,
-              onChanged: (text) => {widget.onSearchStarted(text)},
-              style: const TextStyle(
-                  inherit: true, fontSize: 15, fontWeight: FontWeight.normal),
-              decoration: const InputDecoration(
-                hintStyle: TextStyle(
-                    inherit: true, fontSize: 15, fontWeight: FontWeight.normal),
-                isDense: true,
-                border: InputBorder.none,
-                hintText: 'Type to search..',
-              ),
-            )
+        controller: searchBarController,
+        onChanged: (text) => {widget.onSearchStarted(text)},
+        style: const TextStyle(
+            inherit: true, fontSize: 15, fontWeight: FontWeight.normal),
+        decoration: const InputDecoration(
+          hintStyle: TextStyle(
+              inherit: true, fontSize: 15, fontWeight: FontWeight.normal),
+          isDense: true,
+          border: InputBorder.none,
+          hintText: 'Type to search..',
+        ),
+      )
           : const Text("Notes"),
       actions: [
         IconButton(
@@ -75,9 +79,11 @@ class _NotesAppBar extends State<NotesAppBar> {
         ),
         IconButton(
             onPressed: () {
-              widget.onScrollToTopClicked();
+              widget.scrollIcon == Icons.keyboard_double_arrow_down_rounded
+                  ? widget.onScrollToTopClicked(ScrollTo.bottom)
+                  : widget.onScrollToTopClicked(ScrollTo.top);
             },
-            icon: const Icon(Icons.keyboard_double_arrow_up_rounded)),
+            icon: Icon(widget.scrollIcon)),
         IconButton(onPressed: () {}, icon: const Icon(Icons.grid_view_rounded))
       ],
       // bottom: TabBar(tabs: ),

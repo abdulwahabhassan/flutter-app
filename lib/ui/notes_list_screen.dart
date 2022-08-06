@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/ui/new_note_bottom_sheet.dart';
 import '../model/note.dart';
+import 'notes_app.dart';
 import 'notes_app_bar.dart';
 
-typedef ScrollToTopCallback = void Function();
+typedef ScrollToTopCallback = void Function(ScrollTo);
+
 //WIDGET
 class NotesListScreen extends StatefulWidget {
   const NotesListScreen(
@@ -14,7 +16,8 @@ class NotesListScreen extends StatefulWidget {
       required this.onNoteDeleted,
       required this.onSearchStarted,
       required this.scrollController,
-      required this.onScrollToTopClicked})
+      required this.onScrollToTopClicked,
+      required this.scrollIcon})
       : super(key: key);
 
   final List<Note> notes;
@@ -24,6 +27,7 @@ class NotesListScreen extends StatefulWidget {
   final ValueChanged<String> onSearchStarted;
   final ScrollController scrollController;
   final ScrollToTopCallback onScrollToTopClicked;
+  final IconData scrollIcon;
 
   @override
   State<NotesListScreen> createState() => _NotesListScreen();
@@ -36,7 +40,9 @@ class _NotesListScreen extends State<NotesListScreen> {
       resizeToAvoidBottomInset: true,
       appBar: NotesAppBar(
           onSearchStarted: widget.onSearchStarted,
-          onScrollToTopClicked: widget.onScrollToTopClicked),
+          onScrollToTopClicked: widget.onScrollToTopClicked,
+          listViewScrollController: widget.scrollController,
+          scrollIcon: widget.scrollIcon),
       body: ListView.builder(
           controller: widget.scrollController,
           itemCount: widget.notes.length,
