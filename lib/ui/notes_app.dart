@@ -16,7 +16,7 @@ class NotesApp extends StatefulWidget {
 //STATE
 class _NotesAppState extends State<NotesApp> {
   Note? _selectedNote;
-  List<Note> notes = [];
+  List<Note> _notes = [];
 
   @override
   void initState() {
@@ -36,7 +36,8 @@ class _NotesAppState extends State<NotesApp> {
                 onNoteSelected: _setSelectedNote,
                 onNewNoteAdded: _addNewNote,
                 onNoteDeleted: _deleteNote,
-                notes: notes,
+                onSearchStarted: _filterNotes,
+                notes: _notes,
               )),
           if (_selectedNote != null)
             MaterialPage(
@@ -55,14 +56,17 @@ class _NotesAppState extends State<NotesApp> {
           return true;
         },
       ),
-      theme: ThemeData(primarySwatch: Colors.grey),
+      theme: ThemeData(
+          primarySwatch: Colors.grey,
+          textSelectionTheme:
+              const TextSelectionThemeData(cursorColor: Colors.black)),
     );
   }
 
   Future<void> _fetchNotes() async {
     final data = await SQLiteHelper.getNotes();
     setState(() {
-      notes = data;
+      _notes = data;
     });
   }
 
@@ -81,6 +85,15 @@ class _NotesAppState extends State<NotesApp> {
   Future<void> _addNewNote(Note note) async {
     await SQLiteHelper.insertNote(note);
     _fetchNotes();
+  }
+
+  Future<void> _filterNotes(String searchQuery) async {
+    List<Note> notes = await SQLiteHelper.getNotes();
+    setState(() {
+      _notes = notes.where((element) =>
+      element.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
+          element.body.toLowerCase().contains(searchQuery.toLowerCase())).toList();
+    });
   }
 
   Future<void> _deleteNote(Note note) async {

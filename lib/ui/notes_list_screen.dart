@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/ui/new_note_bottom_sheet.dart';
 import '../model/note.dart';
+import 'notes_app_bar.dart';
 
 //WIDGET
 class NotesListScreen extends StatelessWidget {
@@ -10,32 +11,20 @@ class NotesListScreen extends StatelessWidget {
     required this.onNoteSelected,
     required this.onNewNoteAdded,
     required this.onNoteDeleted,
+    required this.onSearchStarted,
   }) : super(key: key);
 
   final List<Note> notes;
   final ValueChanged<Note> onNoteSelected;
   final ValueChanged<Note> onNewNoteAdded;
   final ValueChanged<Note> onNoteDeleted;
+  final ValueChanged<String> onSearchStarted;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        leading: IconButton(onPressed: () {}, icon: const Icon(Icons.menu)),
-        title: const Text("Notes"),
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.search_rounded)),
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.keyboard_double_arrow_up_rounded)),
-          IconButton(
-              onPressed: () {}, icon: const Icon(Icons.grid_view_rounded))
-        ],
-        // bottom: TabBar(tabs: ),
-        elevation: 0.0,
-        scrolledUnderElevation: 2.0,
-      ),
+      appBar: NotesAppBar(onSearchStarted: onSearchStarted),
       body: ListView.builder(
           itemCount: notes.length,
           itemBuilder: (context, index) {
