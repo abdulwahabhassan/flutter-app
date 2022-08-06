@@ -17,11 +17,28 @@ class NotesApp extends StatefulWidget {
 class _NotesAppState extends State<NotesApp> {
   Note? _selectedNote;
   List<Note> _notes = [];
+  late ScrollController _scrollController;
+
+  // This is what you're looking for!
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0.00,
+      duration: const Duration(seconds: 1),
+      curve: Curves.fastOutSlowIn,
+    );
+  }
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     _fetchNotes();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
   }
 
   @override
@@ -37,6 +54,8 @@ class _NotesAppState extends State<NotesApp> {
                 onNewNoteAdded: _addNewNote,
                 onNoteDeleted: _deleteNote,
                 onSearchStarted: _filterNotes,
+                scrollController: _scrollController,
+                onScrollToTopClicked: _scrollToTop,
                 notes: _notes,
               )),
           if (_selectedNote != null)
@@ -89,10 +108,11 @@ class _NotesAppState extends State<NotesApp> {
 
   Future<void> _filterNotes(String searchQuery) async {
     List<Note> notes = await SQLiteHelper.getNotes();
+    List<Note> filteredNotes = notes.where((element) =>
+    element.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
+        element.body.toLowerCase().contains(searchQuery.toLowerCase())).toList();
     setState(() {
-      _notes = notes.where((element) =>
-      element.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          element.body.toLowerCase().contains(searchQuery.toLowerCase())).toList();
+      _notes = filteredNotes;
     });
   }
 

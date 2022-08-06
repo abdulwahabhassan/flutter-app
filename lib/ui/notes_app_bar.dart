@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 
+import 'notes_list_screen.dart';
+
 class NotesAppBar extends StatefulWidget with PreferredSizeWidget {
-  const NotesAppBar({Key? key, required this.onSearchStarted})
+  const NotesAppBar(
+      {Key? key,
+      required this.onSearchStarted,
+      required this.onScrollToTopClicked})
       : super(key: key);
 
   final ValueChanged<String> onSearchStarted;
+  final ScrollToTopCallback onScrollToTopClicked;
 
   @override
   State<NotesAppBar> createState() => _NotesAppBar();
@@ -17,7 +23,7 @@ class _NotesAppBar extends State<NotesAppBar> {
   bool search = false;
   late final TextEditingController searchBarController;
 
-  activateSearch(bool value) {
+  toggleSearch(bool value) {
     setState(() {
       search = value;
     });
@@ -40,8 +46,7 @@ class _NotesAppBar extends State<NotesAppBar> {
     return AppBar(
       leading: IconButton(onPressed: () {}, icon: const Icon(Icons.menu)),
       title: search
-          ? const Text("Notes")
-          : TextFormField(
+          ? TextFormField(
               controller: searchBarController,
               onChanged: (text) => {widget.onSearchStarted(text)},
               style: const TextStyle(
@@ -53,23 +58,25 @@ class _NotesAppBar extends State<NotesAppBar> {
                 border: InputBorder.none,
                 hintText: 'Type to search..',
               ),
-            ),
+            )
+          : const Text("Notes"),
       actions: [
         IconButton(
-            onPressed: () {
-              search
-                  ? activateSearch(false)
-                  : {
-                      activateSearch(true),
-                      widget.onSearchStarted(""),
-                      searchBarController.clear()
-                    };
-            },
-            icon: search
-                ? const Icon(Icons.search_rounded)
-                : const Icon(Icons.cancel)),
+          onPressed: () {
+            toggleSearch(!search);
+            if (!search) {
+              widget.onSearchStarted("");
+              searchBarController.clear();
+            }
+          },
+          icon: search
+              ? const Icon(Icons.cancel)
+              : const Icon(Icons.search_rounded),
+        ),
         IconButton(
-            onPressed: () {},
+            onPressed: () {
+              widget.onScrollToTopClicked();
+            },
             icon: const Icon(Icons.keyboard_double_arrow_up_rounded)),
         IconButton(onPressed: () {}, icon: const Icon(Icons.grid_view_rounded))
       ],
